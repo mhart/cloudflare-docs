@@ -3,12 +3,20 @@ pcx_content_type: configuration
 title: Workers Bindings
 sidebar:
   order: 1
-
 ---
 
 import { Type, MetaInfo, WranglerConfig } from "~/components";
+import { Dropdown } from "~/components/ui/dropdown.tsx";
 
-## Workers
+<div class="flex items-center justify-between">
+	<h2>Workers</h2>
+	<Dropdown
+		client:load
+		copyText={
+			"#codebase Modify the existing `wrangler.json` to add this binding:\r\n \r\n ```json\r\n {\r\n  \"ai\": {\r\n    \"binding\": \"AI\"\r\n  }\r\n}\r\n ```\r\n \r\nModify the existing `Env` interface (often in `worker-configuration.d.ts`) to include:\r\n\r\n```typescript\r\ninterface Env {\r\n  AI: Ai;\r\n}\r\n```\r\n\r\n Modify the main worker fetch handler to return this response:\r\n\r\n ```typescript\r\nif (new URL(request.url).pathname === '/chat') {\r\n    const stream = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {\r\n      stream: true,\r\n      messages: [\r\n        { role: 'system', content: 'You are a helpful assistant' },\r\n        { role: 'user', content: \"How many r's in strawberry? Think through step by step\" },\r\n      ],\r\n    });\r\n\r\n    return new Response(stream as ReadableStream, {\r\n      headers: { 'content-type': 'text/event-stream' },\r\n    });\r\n}\r\n```"
+		}
+	/>
+</div>
 
 [Workers](/workers/) provides a serverless execution environment that allows you to create new applications or augment existing ones.
 
@@ -38,33 +46,29 @@ To configure a Workers AI binding in your Pages Function, you must use the Cloud
 `async env.AI.run()` runs a model. Takes a model as the first parameter, and an object as the second parameter.
 
 ```javascript
-const answer = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-    prompt: "What is the origin of the phrase 'Hello, World'"
+const answer = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+	prompt: "What is the origin of the phrase 'Hello, World'",
 });
 ```
 
 **Parameters**
 
+- `model` <Type text="string" /> <MetaInfo text="required" />
 
-
-* `model` <Type text="string" /> <MetaInfo text="required" />
-
-  * The model to run.
+  - The model to run.
 
   **Supported options**
 
-  * `stream` <Type text="boolean" /> <MetaInfo text="optional" />
-    * Returns a stream of results as they are available.
-
-
+  - `stream` <Type text="boolean" /> <MetaInfo text="optional" />
+    - Returns a stream of results as they are available.
 
 ```javascript
-const answer = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-    prompt: "What is the origin of the phrase 'Hello, World'",
-    stream: true
+const answer = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+	prompt: "What is the origin of the phrase 'Hello, World'",
+	stream: true,
 });
 
 return new Response(answer, {
-    headers: { "content-type": "text/event-stream" }
+	headers: { "content-type": "text/event-stream" },
 });
 ```

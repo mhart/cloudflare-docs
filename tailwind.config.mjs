@@ -164,5 +164,5 @@ export default {
 			},
 		},
 	},
-	plugins: [starlightPlugin()],
+	plugins: [starlightPlugin(), require("tailwindcss-animate")],
 };
